@@ -1,15 +1,22 @@
 'use client'
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
-import { Button, Callout, TextField } from "@radix-ui/themes";
+import { Button, Callout, Text, TextField } from "@radix-ui/themes";
 import { useForm, Controller,SubmitHandler } from "react-hook-form"
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { z } from "zod";
+import { createIssueSchema } from "@/app/validationSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+type IssueForm=z.infer<typeof createIssueSchema>
 
 
 const NewIssuePage = () => {
-  const {register,handleSubmit,control}=useForm()
+  const {register,handleSubmit,control,formState:{errors}}=useForm<IssueForm>({
+    resolver:zodResolver(createIssueSchema)
+  })
   const router=useRouter()
   const [error,setError]=useState('')
   return (
@@ -35,6 +42,7 @@ const NewIssuePage = () => {
     )}
     >
         <TextField.Root placeholder="Title" {...register('title')} />
+        {errors.title && <Text color="red" as='p'>{errors.title?.message}</Text>}
         <Controller
         name="desc"
         control={control}
@@ -42,6 +50,7 @@ const NewIssuePage = () => {
         <SimpleMDE placeholder="Description" {...field} />
         }
         />
+        {errors.desc && <Text color="red" as='p'>{errors.desc?.message}</Text>}
             <Button>Submit New Issue</Button>
         
     </form>
