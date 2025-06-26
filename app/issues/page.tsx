@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { Button, Table } from '@radix-ui/themes'
-import Link from 'next/link'
+import Link from '@/app/components/Link'
 import React from 'react'
 import IssueStatusBadge from '../components/IssueStatusBadge'
 import delay from 'delay'
