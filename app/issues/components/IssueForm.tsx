@@ -4,19 +4,16 @@ import { ErrorMessage } from "@/app/components"
 import { IssueSchema } from "@/app/validationSchemas"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Issue } from "@prisma/client"
-import { Callout, TextField, Button, Spinner } from "@radix-ui/themes"
+import { Button, Callout, Spinner, TextField } from "@radix-ui/themes"
 import axios from "axios"
-import dynamic from "next/dynamic"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useForm, Controller } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
+import SimpleMDE from 'react-simplemde-editor'
 import z from "zod"
 
 type IssueFormData=z.infer<typeof IssueSchema>
-const SimpleMDE=dynamic(()=>
-import('react-simplemde-editor'),
-{ssr:false}
-)
+
 
 const IssueForm = ({issue}:{issue?:Issue}) => {
   const {register,handleSubmit,control,formState:{errors}}=useForm<IssueFormData>({
@@ -29,7 +26,10 @@ const IssueForm = ({issue}:{issue?:Issue}) => {
       async(data)=>{
         try{
           setSubmitting(true)
-          await axios.post('/api/issues',data)
+          if(issue)
+            await axios.post(`/api/issues/${issue.id}`,data)  
+          else
+            await axios.post('/api/issues',data)
           router.push('/issues')
         }
         catch(error){

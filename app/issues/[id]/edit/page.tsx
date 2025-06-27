@@ -1,7 +1,9 @@
-import React from 'react'
-import IssueForm from '../../components/IssueForm'
-import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import dynamic from 'next/dynamic'
+import { notFound } from 'next/navigation'
+import IssueFormSkeleton from './loading'
+import ClientOnlyIssueForm from '../../components/ClientOnlyIssueForm'
+
 
 const EditIssuePage = async( {
   params,
@@ -20,8 +22,10 @@ const { id } = await params
 
   if (!issue) notFound()
 
+    
+
   return (
-    <IssueForm issue={issue}/>
+    <ClientOnlyIssueForm issue={issue}/>
   )
 }
 
