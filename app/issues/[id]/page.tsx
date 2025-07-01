@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import EditIssueButton from './EditIssueButton'
 import IssueDetails from './IssueDetails'
 import DeleteIssueButton from './DeleteIssueButton'
+import { auth } from '@/auth'
+
 
 const IssueDetailPage = async (
     {
@@ -12,6 +14,9 @@ const IssueDetailPage = async (
   params: Promise<{ id: string }>
 }
 ) => {
+
+  const session = await auth()
+
   const { id } = await params
   
   const parsedId = Number(id)
@@ -28,12 +33,12 @@ const IssueDetailPage = async (
           <Box className='md:col-span-4'>
             <IssueDetails issue={issue}/>
           </Box>
-          <Box>
+          {session && (<Box>
                 <Flex direction="column" gap="4">
                   <EditIssueButton issueId={issue.id}/>
                   <DeleteIssueButton issueId={issue.id}/>
                 </Flex>
-          </Box>
+          </Box>)}
     </Grid>
     
   )
