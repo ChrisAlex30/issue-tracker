@@ -5,6 +5,7 @@ import EditIssueButton from './EditIssueButton'
 import IssueDetails from './IssueDetails'
 import DeleteIssueButton from './DeleteIssueButton'
 import { auth } from '@/auth'
+import AssigneeSelect from './AssigneeSelect'
 
 
 const IssueDetailPage = async (
@@ -35,6 +36,7 @@ const IssueDetailPage = async (
           </Box>
           {session && (<Box>
                 <Flex direction="column" gap="4">
+                  <AssigneeSelect issue={issue} />
                   <EditIssueButton issueId={issue.id}/>
                   <DeleteIssueButton issueId={issue.id}/>
                 </Flex>
