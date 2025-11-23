@@ -2,21 +2,24 @@ import { prisma } from '@/lib/prisma'
 import { Table } from '@radix-ui/themes'
 import {IssueStatusBadge,Link} from '@/app/components'
 import IssueActions from './IssueActions'
-import { Status } from '@prisma/client'
+import { Issue, Status } from '@prisma/client'
 import { StatusFilter } from '@/lib/types'
+import NextLink from "next/link"
+import { ArrowUpIcon } from '@radix-ui/react-icons'
 
 interface Props{
-  searchParams:Promise<{status:StatusFilter}>
+  searchParams:Promise<{status:StatusFilter,orderBy:keyof Issue}>
 }
+type Cols = {
+  label: string;
+  value: keyof Issue;
+  className?: string;
+}[];
 
 
 const IssuesPage = async({searchParams}:Props) => {
-
-//TS doesnt let prisma use the code just below  
-// const statuses=Object.values(Status);
-// const status=statuses.includes(searchParams.status as Status)?searchParams.status:undefined;
-
-const { status: rawStatus } = await searchParams;
+  
+const { status: rawStatus,orderBy } = await searchParams;
 
 const statuses = Object.values(Status) as Status[];
 
@@ -24,10 +27,19 @@ const isStatus=(v: unknown): v is Status => typeof v === "string" && statuses.in
 
 const status: Status | undefined = isStatus(rawStatus) ? rawStatus : undefined;
 
+const columns:Cols=[
+  {label:"Issue",value:"title"},
+  {label:"Status",value:"status",className:"hidden md:table-cell"},
+  {label:"Created",value:"createdAt",className:"hidden md:table-cell"},
+]
+
+const order_by=columns.map(col=>col.value).includes(orderBy)?{[orderBy]:'asc'}:undefined
+
 const issues =await prisma.issue.findMany({
     where:{
-      status
-    }
+      status,
+    },
+    orderBy:order_by
 })
   return (
     <div>
@@ -35,9 +47,19 @@ const issues =await prisma.issue.findMany({
       <Table.Root variant='surface'>
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className='hidden md:table-cell'>Status</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className='hidden md:table-cell'>Created</Table.ColumnHeaderCell>
+            {
+              columns.map(col=>
+                <Table.ColumnHeaderCell key={col.value} className={col.className}>
+                  <NextLink href={{
+                    query:{status:rawStatus,orderBy:col.value}
+                  }}>{col.label}</NextLink>
+                  {col.value===orderBy && <ArrowUpIcon className='inline'/>}
+                </Table.ColumnHeaderCell>
+                
+              )
+            }
+            {/* <Table.ColumnHeaderCell className='hidden md:table-cell'>Status</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className='hidden md:table-cell'>Created</Table.ColumnHeaderCell> */}
           </Table.Row>
         </Table.Header>
         <Table.Body>
