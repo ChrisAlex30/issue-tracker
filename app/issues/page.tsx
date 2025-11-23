@@ -2,10 +2,33 @@ import { prisma } from '@/lib/prisma'
 import { Table } from '@radix-ui/themes'
 import {IssueStatusBadge,Link} from '@/app/components'
 import IssueActions from './IssueActions'
+import { Status } from '@prisma/client'
+import { StatusFilter } from '@/lib/types'
 
-const IssuesPage = async() => {
+interface Props{
+  searchParams:Promise<{status:StatusFilter}>
+}
 
-  const issues =await prisma.issue.findMany()
+
+const IssuesPage = async({searchParams}:Props) => {
+
+//TS doesnt let prisma use the code just below  
+// const statuses=Object.values(Status);
+// const status=statuses.includes(searchParams.status as Status)?searchParams.status:undefined;
+
+const { status: rawStatus } = await searchParams;
+
+const statuses = Object.values(Status) as Status[];
+
+const isStatus=(v: unknown): v is Status => typeof v === "string" && statuses.includes(v as Status);
+
+const status: Status | undefined = isStatus(rawStatus) ? rawStatus : undefined;
+
+const issues =await prisma.issue.findMany({
+    where:{
+      status
+    }
+})
   return (
     <div>
       <IssueActions/>
