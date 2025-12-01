@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Table } from '@radix-ui/themes'
+import { Flex, Table } from '@radix-ui/themes'
 import {IssueStatusBadge,Link} from '@/app/components'
 import IssueActions from './IssueActions'
 import { Issue, Status } from '@prisma/client'
@@ -54,11 +54,11 @@ const issueCount =await prisma.issue.count({
     }
 })
   return (
-    <div>
+    <Flex direction="column" gap="3">
       <IssueActions/>
       <IssueTable issues={issues} searchParams={sP} />
       <Pagination pageSize={pageSize} currentPage={page} itemCount={issueCount} />
-    </div>
+    </Flex>
   )
 }
 
